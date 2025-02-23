@@ -127,14 +127,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="confirm_password" class="form-label">Confirm Password</label>
                             <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
                         </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Register</button>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-custom-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Register
+                            </button>
                         </div>
                     </form>
 
-                    <div class="text-center mt-3">
-                        Already have an account? <a href="login.php">Login here</a>
+                    <div class="text-center mt-3 form-label">
+                        Already have an account? <a href="login.php" class="text-primary text-decoration-none">Login here</a>
                     </div>
                 </div>
             </div>
@@ -142,4 +143,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 
-<?php require_once '../includes/footer.php'; ?> 

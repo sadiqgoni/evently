@@ -1,6 +1,6 @@
 /* Custom Variables */
 :root {
-    --primary-color: #FFD700;  /* Yellow */
+    --primary-color: #FFD700; 
     --secondary-color: #FFC107;
     --accent-color: #FFD700;
     --text-color: #FFFFFF;
@@ -345,6 +345,13 @@ footer {
     margin-bottom: 20px;
     border-radius: 8px;
 }
+.alert li{
+color:red
+}
+.alert-success{
+color: rgb(107, 233, 107);   
+}
+
 
 /* Button Styles */
 .btn-primary {
