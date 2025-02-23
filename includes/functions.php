@@ -85,7 +85,7 @@ function getUserDetails($userId) {
 
 // Function to format currency
 function formatCurrency($amount) {
-    return '$' . number_format($amount, 2);
+    return '₦' . number_format($amount, 2);
 }
 
 // Function to format date

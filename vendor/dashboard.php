@@ -355,4 +355,4 @@ $recent_sales = $stmt->get_result();
 }
 </style>
 
-<?php require_once '../includes/footer.php'; ?> 
+ 

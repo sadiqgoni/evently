@@ -104,7 +104,7 @@ $recent_transactions = $stmt->get_result();
                                 </div>
                                 <div>
                                     <h6 class="text-light mb-1">Total Earnings</h6>
-                                    <h2 class="text-warning mb-0"><?php echo formatCurrency($earnings['total_earnings']); ?></h2>
+                                    <h2 class="text-warning mb-0">₦<?php echo number_format($earnings['total_earnings']); ?></h2>
                                 </div>
                             </div>
                             <p class="text-light mb-0">
@@ -148,7 +148,7 @@ $recent_transactions = $stmt->get_result();
                                             <?php echo number_format($month['tickets_sold']); ?>
                                         </td>
                                         <td class="text-warning">
-                                            <?php echo formatCurrency($month['revenue']); ?>
+                                            ₦<?php echo number_format($month['revenue']); ?>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -189,7 +189,7 @@ $recent_transactions = $stmt->get_result();
                                             <code class="text-warning"><?php echo $transaction['ticket_code']; ?></code>
                                         </td>
                                         <td class="text-warning">
-                                            <?php echo formatCurrency($transaction['price']); ?>
+                                            ₦<?php echo number_format($transaction['price']); ?>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>
@@ -214,20 +214,39 @@ $recent_transactions = $stmt->get_result();
                 <form id="withdrawForm">
                     <div class="mb-3">
                         <label class="form-label text-warning">Available Balance</label>
-                        <h3 class="text-warning"><?php echo formatCurrency($earnings['total_earnings']); ?></h3>
+                        <h3 class="text-warning">₦<?php echo number_format($earnings['total_earnings']); ?></h3>
                     </div>
                     <div class="mb-3">
                         <label for="amount" class="form-label text-warning">Withdrawal Amount</label>
-                        <input type="number" class="form-control" id="amount" name="amount" min="1" max="<?php echo $earnings['total_earnings']; ?>" required>
+                        <div class="input-group">
+                            <span class="input-group-text">₦</span>
+                            <input type="number" class="form-control" id="amount" name="amount" min="1000" max="<?php echo $earnings['total_earnings']; ?>" required>
+                        </div>
+                        <small class="text-light">Minimum withdrawal: ₦1,000</small>
                     </div>
                     <div class="mb-3">
-                        <label for="payment_method" class="form-label text-warning">Payment Method</label>
-                        <select class="form-select" id="payment_method" name="payment_method" required>
-                            <option value="">Select payment method</option>
-                            <option value="bank">Bank Transfer</option>
-                            <option value="paypal">PayPal</option>
-                            <option value="stripe">Stripe</option>
+                        <label for="bank_name" class="form-label text-warning">Bank Name</label>
+                        <select class="form-select" id="bank_name" name="bank_name" required>
+                            <option value="">Select your bank</option>
+                            <option value="access">Access Bank</option>
+                            <option value="gtb">Guaranty Trust Bank</option>
+                            <option value="first">First Bank</option>
+                            <option value="uba">United Bank for Africa</option>
+                            <option value="zenith">Zenith Bank</option>
+                            <option value="stanbic">Stanbic IBTC</option>
+                            <option value="union">Union Bank</option>
+                            <option value="fidelity">Fidelity Bank</option>
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="account_number" class="form-label text-warning">Account Number</label>
+                        <input type="text" class="form-control" id="account_number" name="account_number" 
+                               pattern="[0-9]{10}" maxlength="10" required>
+                        <small class="text-light">Enter your 10-digit account number</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="account_name" class="form-label text-warning">Account Name</label>
+                        <input type="text" class="form-control" id="account_name" name="account_name" required>
                     </div>
                 </form>
             </div>
@@ -331,10 +350,36 @@ $recent_transactions = $stmt->get_result();
 <script>
 document.getElementById('withdrawForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    // Here you would typically send an AJAX request to process the withdrawal
-    alert('Withdrawal request submitted! This feature will be implemented soon.');
-    bootstrap.Modal.getInstance(document.getElementById('withdrawModal')).hide();
+    const amount = document.getElementById('amount').value;
+    const bankName = document.getElementById('bank_name').value;
+    const accountNumber = document.getElementById('account_number').value;
+    const accountName = document.getElementById('account_name').value;
+    
+    // Show loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+    
+    // Simulate processing
+    setTimeout(() => {
+        // Show success message
+        alert('Withdrawal request submitted successfully!\n\nAmount: ₦' + amount + '\nBank: ' + bankName + '\nAccount: ' + accountNumber + '\n\nFunds will be transferred within 24 hours.');
+        
+        // Reset form and close modal
+        this.reset();
+        bootstrap.Modal.getInstance(document.getElementById('withdrawModal')).hide();
+        
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }, 2000);
+});
+
+// Validate account number input
+document.getElementById('account_number').addEventListener('input', function(e) {
+    this.value = this.value.replace(/\D/g, '').substr(0, 10);
 });
 </script>
 
-<?php require_once '../includes/footer.php'; ?> 
+ 

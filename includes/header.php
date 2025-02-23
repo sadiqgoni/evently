@@ -37,7 +37,7 @@ require_once 'functions.php';
                         <a class="nav-link" href="/evently">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/evently/events.php">Features</a>
+                        <a class="nav-link" href="/evently/events.php">Browse Events</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">

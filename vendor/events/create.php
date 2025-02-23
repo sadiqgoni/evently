@@ -209,7 +209,7 @@ $categories = [
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="ticket_price" class="form-label text-warning">Ticket Price ($)</label>
+                                    <label for="ticket_price" class="form-label text-warning">Ticket Price (₦)</label>
                                     <input type="number" class="form-control custom-input" id="ticket_price" name="ticket_price" 
                                            value="<?php echo isset($_POST['ticket_price']) ? htmlspecialchars($_POST['ticket_price']) : ''; ?>" 
                                            min="0" step="0.01" required>

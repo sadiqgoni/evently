@@ -35,29 +35,29 @@ $categories = $conn->query($sql);
 <section class="py-5">
     <div class="container">
         <div class="text-center mb-5">
-            <h2 class="section-heading">Key Features</h2>
-            <p class="lead text-muted">Everything you need to discover, attend, and manage events in one place.</p>
+            <h2 class="section-heading text-warning">Key Features</h2>
+            <p class="lead text-light">Everything you need to discover, attend, and manage events in one place.</p>
         </div>
         <div class="row">
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="feature-card">
                     <i class="fas fa-search"></i>
-                    <h3>Event Discovery</h3>
-                    <p>Easily find and explore a wide range of events tailored to your interests.</p>
+                    <h3 class="text-warning">Event Discovery</h3>
+                    <p class="text-light">Easily find and explore a wide range of events tailored to your interests.</p>
                 </div>
             </div>
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="feature-card">
                     <i class="fas fa-qrcode"></i>
-                    <h3>Secure Ticketing</h3>
-                    <p>Purchase and store tickets securely with our integrated QR code system.</p>
+                    <h3 class="text-warning">Secure Ticketing</h3>
+                    <p class="text-light">Purchase and store tickets securely with our integrated QR code system.</p>
                 </div>
             </div>
             <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
                 <div class="feature-card">
                     <i class="fas fa-user-circle"></i>
-                    <h3>User Dashboard</h3>
-                    <p>Manage your events, tickets, and preferences from a personalized dashboard.</p>
+                    <h3 class="text-warning">User Dashboard</h3>
+                    <p class="text-light">Manage your events, tickets, and preferences from a personalized dashboard.</p>
                 </div>
             </div>
         </div>
@@ -105,17 +105,17 @@ $categories = $conn->query($sql);
 </section>
 
 <!-- Categories Section -->
-<section class="py-5 bg-light">
+<section class="py-5 bg-dark">
     <div class="container">
-        <h2 class="mb-4">Browse by Category</h2>
+        <h2 class="mb-4 text-warning">Browse by Category</h2>
         <div class="row">
             <?php while ($category = $categories->fetch_assoc()): ?>
                 <div class="col-md-3 mb-3">
                     <a href="events.php?category=<?php echo urlencode($category['category']); ?>" 
-                       class="card text-center h-100 text-decoration-none">
+                       class="card text-center h-100 text-decoration-none bg-dark">
                         <div class="card-body">
-                            <i class="fas fa-folder mb-3 text-primary fa-2x"></i>
-                            <h5 class="card-title"><?php echo htmlspecialchars($category['category']); ?></h5>
+                            <i class="fas fa-folder mb-3 text-warning fa-2x"></i>
+                            <h5 class="card-title text-light"><?php echo htmlspecialchars($category['category']); ?></h5>
                         </div>
                     </a>
                 </div>

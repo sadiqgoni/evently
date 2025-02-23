@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/config.php';
-require_once '../includes/functions.php';
+require_once '../../includes/config.php';
+require_once '../../includes/functions.php';
 
 // Initialize variables
 $errors = [];
@@ -13,10 +13,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $role = sanitize($_POST['role']);
     $first_name = sanitize($_POST['first_name']);
     $last_name = sanitize($_POST['last_name']);
-    $admin_token = isset($_POST['admin_token']) ? sanitize($_POST['admin_token']) : '';
+    $admin_token = sanitize($_POST['admin_token']);
 
     // Validate inputs
     if (empty($username)) {
@@ -35,12 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password !== $confirm_password) {
         $errors[] = "Passwords do not match";
     }
-    if (!in_array($role, ['vendor', 'customer'])) {
-        $errors[] = "Invalid role selected";
-    }
-    
-    // Validate admin token if role is admin
-    if ($role === 'admin' && $admin_token !== 'evently') {
+    if (empty($admin_token)) {
+        $errors[] = "Admin token is required";
+    } elseif ($admin_token !== 'evently') {
         $errors[] = "Invalid admin token";
     }
 
@@ -57,15 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         // Hash password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $role = 'admin';
         
         // Insert user into database
         $stmt = $conn->prepare("INSERT INTO users (username, email, password, role, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssss", $username, $email, $hashed_password, $role, $first_name, $last_name);
         
         if ($stmt->execute()) {
-            // Send verification email (to be implemented)
             $success = true;
-            redirectWith('login.php', 'Registration successful! Please check your email for verification.', 'success');
+            redirectWith('../../auth/login.php', 'Admin registration successful! Please login.', 'success');
         } else {
             $errors[] = "Registration failed. Please try again.";
         }
@@ -73,14 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<?php require_once '../includes/header.php'; ?>
+<?php require_once '../../includes/header.php'; ?>
 
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="text-center">Register</h3>
+                    <h3 class="text-center">Admin Registration</h3>
                 </div>
                 <div class="card-body">
                     <?php if (!empty($errors)): ?>
@@ -95,12 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <form method="POST" action="">
                         <div class="mb-3">
-                            <label for="role" class="form-label">Register as</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="">Select role</option>
-                                <option value="customer">Customer</option>
-                                <option value="vendor">Event Organizer</option>
-                            </select>
+                            <label for="admin_token" class="form-label">Admin Token</label>
+                            <input type="password" class="form-control" id="admin_token" name="admin_token" required>
                         </div>
 
                         <div class="mb-3">
@@ -133,32 +125,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="confirm_password" class="form-label">Confirm Password</label>
                             <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
                         </div>
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-custom-primary btn-lg">
-                                <i class="fas fa-sign-in-alt me-2"></i>Register
+                                <i class="fas fa-user-shield me-2"></i>Register as Admin
                             </button>
                         </div>
                     </form>
 
                     <div class="text-center mt-3 form-label">
-                        Already have an account? <a href="login.php" class="text-primary text-decoration-none">Login here</a>
+                        Already have an account? <a href="../../auth/login.php" class="text-primary text-decoration-none">Login here</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<script>
-function toggleAdminToken() {
-    const roleSelect = document.getElementById('role');
-    const adminTokenField = document.getElementById('adminTokenField');
-    
-    if (roleSelect.value === 'admin') {
-        adminTokenField.style.display = 'block';
-    } else {
-        adminTokenField.style.display = 'none';
-    }
-}
-</script>
-
+</div> 

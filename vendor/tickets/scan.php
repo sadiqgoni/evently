@@ -198,6 +198,43 @@ $events = $stmt->get_result();
 </div>
 
 <style>
+    .sidebar-card {
+    border: none;
+    border-radius: 15px;
+    background: var(--dark-card);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list-group-item {
+    background: var(--dark-card);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    padding: 1rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+
+.list-group-item:hover {
+    transform: translateX(5px);
+    background-color: rgba(255, 215, 0, 0.1) !important;
+}
+
+.list-group-item.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--dark-bg);
+}
 .scanner-container {
     position: relative;
     max-width: 500px;
