@@ -115,4 +115,82 @@ function logout() {
     
     // Redirect to login page
     redirectWith('/evently/auth/login.php', 'You have been successfully logged out.', 'success');
+}
+
+// Function to generate QR code for ticket
+function generateTicketQRCode($ticketCode, $eventId, $userId) {
+    // Create QR code data
+    $qrData = [
+        'ticket_code' => $ticketCode,
+        'event_id' => $eventId,
+        'user_id' => $userId,
+        'timestamp' => time()
+    ];
+    
+    // Convert to JSON and encrypt
+    $qrJson = json_encode($qrData);
+    $encryptedData = base64_encode($qrJson); // In production, use proper encryption
+    
+    // Generate QR code path
+    $qrCodePath = '/evently/uploads/qrcodes/' . $ticketCode . '.png';
+    
+    return [
+        'qr_data' => $encryptedData,
+        'qr_path' => $qrCodePath
+    ];
+}
+
+// Function to verify ticket QR code
+function verifyTicketQRCode($ticketCode) {
+    global $conn;
+    
+    // Get ticket from database
+    $sql = "SELECT t.*, e.title as event_title, e.date as event_date,
+            u.first_name, u.last_name, u.email 
+            FROM tickets t 
+            JOIN events e ON t.event_id = e.id 
+            JOIN users u ON t.user_id = u.id 
+            WHERE t.ticket_code = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $ticketCode);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($ticket = $result->fetch_assoc()) {
+        if ($ticket['is_used']) {
+            return [
+                'valid' => false, 
+                'message' => 'Ticket has already been used on ' . formatDate($ticket['used_at'])
+            ];
+        }
+        
+        if (strtotime($ticket['event_date']) < time()) {
+            return [
+                'valid' => false, 
+                'message' => 'Event has already ended'
+            ];
+        }
+        
+        // Mark ticket as used
+        $sql = "UPDATE tickets SET is_used = 1, used_at = NOW() WHERE ticket_code = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $ticketCode);
+        $stmt->execute();
+        
+        return [
+            'valid' => true,
+            'message' => 'Valid ticket',
+            'ticket' => [
+                'code' => $ticket['ticket_code'],
+                'event_id' => $ticket['event_id'],
+                'event' => $ticket['event_title'],
+                'date' => formatDate($ticket['event_date']),
+                'customer' => $ticket['first_name'] . ' ' . $ticket['last_name'],
+                'email' => $ticket['email']
+            ]
+        ];
+    }
+    
+    return ['valid' => false, 'message' => 'Ticket not found'];
 } 

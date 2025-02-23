@@ -69,8 +69,12 @@ $sql = "CREATE TABLE IF NOT EXISTS tickets (
     event_id INT NOT NULL,
     user_id INT NOT NULL,
     ticket_code VARCHAR(50) UNIQUE NOT NULL,
+    qr_code TEXT,
+    qr_code_path VARCHAR(255),
+    price DECIMAL(10,2) NOT NULL,
     purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_used BOOLEAN DEFAULT FALSE,
+    used_at TIMESTAMP NULL,
     FOREIGN KEY (event_id) REFERENCES events(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 )";

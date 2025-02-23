@@ -233,7 +233,15 @@ footer {
 .event-card .card-title {
     color: var(--text-color);
 }
-
+.card-title {
+    color: var(--text-color);
+}
+.card-text {
+    color: var(--text-color);
+}
+.text-muted {
+    color: var(--text-color);
+}
 .event-meta {
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.9rem;
