@@ -142,7 +142,7 @@ $categories = $conn->query($sql);
 </section>
 
 <!-- Footer -->
-
+<?php require_once 'includes/footer.php'; ?>  
 
 <!-- AOS Animation -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

@@ -38,8 +38,26 @@ function showMessage() {
 }
 
 // Function to generate random ticket code
-function generateTicketCode() {
-    return strtoupper(uniqid() . bin2hex(random_bytes(4)));
+function generateTicketCode($event_title = '') {
+    // Get today's date in YYMMDD format
+    $date = date('ymd');
+    
+    // Get event name abbreviation (first letter of each word, up to 3 letters)
+    $words = explode(' ', strtoupper(trim($event_title)));
+    $abbr = '';
+    foreach ($words as $word) {
+        if (strlen($abbr) < 3 && !empty($word)) {
+            $abbr .= substr($word, 0, 1);
+        }
+    }
+    // If abbreviation is shorter than 3 letters, pad with 'X'
+    $abbr = str_pad($abbr, 3, 'X');
+
+    // Generate a unique 4-character identifier
+    $unique = strtoupper(substr(uniqid(), -4));
+    
+    // Combine all parts with dashes
+    return $date . '-' . $abbr . '-' . $unique;
 }
 
 // Function to update user balance
@@ -69,6 +87,59 @@ function updateBalance($userId, $amount, $type, $description) {
         // Rollback on error
         $conn->rollback();
         return false;
+    }
+}
+
+// Function to process vendor withdrawal
+function processWithdrawal($vendorId, $amount, $bankName, $accountNumber) {
+    global $conn;
+    
+    // Start transaction
+    $conn->begin_transaction();
+    
+    try {
+        // Get vendor's current balance
+        $stmt = $conn->prepare("SELECT balance FROM users WHERE id = ? AND role = 'vendor'");
+        $stmt->bind_param("i", $vendorId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $vendor = $result->fetch_assoc();
+        
+        if (!$vendor) {
+            throw new Exception('Vendor not found');
+        }
+        
+        if ($vendor['balance'] < $amount) {
+            throw new Exception('Insufficient balance');
+        }
+        
+        // Create withdrawal record
+        $status = 'pending';
+        $sql = "INSERT INTO withdrawals (vendor_id, amount, bank_name, account_number, status) 
+                VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("idsss", $vendorId, $amount, $bankName, $accountNumber, $status);
+        $stmt->execute();
+        
+        // Deduct amount from vendor's balance
+        $description = "Withdrawal request to " . $bankName . " (" . substr($accountNumber, -4) . ")";
+        if (!updateBalance($vendorId, $amount, 'debit', $description)) {
+            throw new Exception('Failed to update balance');
+        }
+        
+        // Commit transaction
+        $conn->commit();
+        return [
+            'success' => true,
+            'message' => 'Withdrawal request processed successfully'
+        ];
+    } catch (Exception $e) {
+        // Rollback on error
+        $conn->rollback();
+        return [
+            'success' => false,
+            'message' => $e->getMessage()
+        ];
     }
 }
 
@@ -129,7 +200,7 @@ function generateTicketQRCode($ticketCode, $eventId, $userId) {
     
     // Convert to JSON and encrypt
     $qrJson = json_encode($qrData);
-    $encryptedData = base64_encode($qrJson); // In production, use proper encryption
+    $encryptedData = base64_encode($qrJson); 
     
     // Generate QR code path
     $qrCodePath = '/evently/uploads/qrcodes/' . $ticketCode . '.png';

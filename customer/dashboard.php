@@ -316,7 +316,7 @@ $monthly_spending = $stmt->get_result();
                     <div class="mb-3">
                         <label for="amount" class="form-label text-warning">Amount to Add</label>
                         <div class="input-group">
-                            <span class="input-group-text bg-dark border-warning text-warning">$</span>
+                            <span class="input-group-text bg-dark border-warning text-warning">₦</span>
                             <input type="number" class="form-control" id="amount" name="amount" 
                                    min="1" step="0.01" required>
                         </div>

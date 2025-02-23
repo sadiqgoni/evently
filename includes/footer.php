@@ -11,24 +11,24 @@
                 <h5>Quick Links</h5>
                 <ul>
                     <li><a href="events.php">Browse Events</a></li>
-                    <li><a href="about.php">About Us</a></li>
-                    <li><a href="contact.php">Contact</a></li>
-                    <li><a href="faq.php">FAQs</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">FAQs</a></li>
                 </ul>
             </div>
             <div class="col-md-4 mb-4">
                 <h5>Contact Us</h5>
                 <ul>
-                    <li><i class="fas fa-envelope me-2"></i>support@evently.com</li>
-                    <li><i class="fas fa-phone me-2"></i>(123) 456-7890</li>
-                    <li><i class="fas fa-map-marker-alt me-2"></i>123 Event Street, City</li>
+                    <li><i class="fas fa-envelope me-2"></i>imusty003@gmail.com</li>
+                    <li><i class="fas fa-phone me-2"></i>(234) 707 241 9756</li>
+                    <li><i class="fas fa-map-marker-alt me-2"></i>Abuja, Nigeria</li>
                 </ul>
             </div>
         </div>
         <hr class="mt-4 mb-4">
         <div class="row">
             <div class="col-md-6 text-center text-md-start">
-                <p class="mb-0">&copy; 2024 Evently. All rights reserved.</p>
+                <p class="mb-0">&copy; 2025 Evently. All rights reserved.</p>
             </div>
             <div class="col-md-6 text-center text-md-end">
                 <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>

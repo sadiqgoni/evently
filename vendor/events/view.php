@@ -171,7 +171,7 @@ echo "<!-- Debug 8: Recent tickets count: " . count($recent_tickets) . " -->\n";
                                         </p>
                                         <p class="mb-2">
                                             <i class="fas fa-dollar-sign text-warning me-2"></i>
-                                            $<?php echo number_format($event['total_sales'], 2); ?> total sales
+                                            ₦<?php echo number_format($event['total_sales'], 2); ?> total sales
                                         </p>
                                     </div>
                                 </div>
@@ -485,4 +485,3 @@ echo "<!-- Debug 8: Recent tickets count: " . count($recent_tickets) . " -->\n";
     }
 </style>
 
-<?php require_once '../../includes/footer.php'; ?> 

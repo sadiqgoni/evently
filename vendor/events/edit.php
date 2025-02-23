@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get categories for dropdown
 $categories = [
-    'Music', 'Sports', 'Theater', 'Conference', 'Workshop', 
+    'Music', 'Wedding','Sports', 'Theater', 'Conference', 'Workshop', 
     'Exhibition', 'Festival', 'Networking', 'Food & Drink', 'Other'
 ];
 ?>
@@ -439,4 +439,3 @@ document.getElementById('image').addEventListener('change', function(e) {
 });
 </script>
 
-<?php require_once '../../includes/footer.php'; ?> 

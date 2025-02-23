@@ -361,4 +361,3 @@ function showQRCode(data) {
 }
 </script>
 
-<?php require_once '../../includes/footer.php'; ?> 

@@ -98,6 +98,23 @@ if ($conn->query($sql) === FALSE) {
     die("Error creating transactions table: " . $conn->error);
 }
 
+// Create withdrawals table
+$sql = "CREATE TABLE IF NOT EXISTS withdrawals (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vendor_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    bank_name VARCHAR(100) NOT NULL,
+    account_number VARCHAR(20) NOT NULL,
+    status ENUM('pending', 'completed', 'rejected') NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    processed_at TIMESTAMP NULL,
+    FOREIGN KEY (vendor_id) REFERENCES users(id)
+)";
+
+if ($conn->query($sql) === FALSE) {
+    die("Error creating withdrawals table: " . $conn->error);
+}
+
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

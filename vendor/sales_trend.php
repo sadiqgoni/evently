@@ -10,53 +10,65 @@ requireVendor();
 $vendor_id = $_SESSION['user_id'];
 $vendor = getUserDetails($vendor_id);
 
-// Get date range from query parameters or default to last 30 days
-$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d', strtotime('-30 days'));
-$end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
-
-// Get sales trend data
+// Get daily sales for the last 30 days
 $sql = "SELECT 
-            DATE(t.purchase_date) as sale_date,
-            COUNT(*) as tickets_sold,
-            SUM(t.price) as revenue
+        DATE(t.purchase_date) as sale_date,
+        COUNT(*) as tickets_sold,
+        SUM(t.price) as revenue
         FROM tickets t
         JOIN events e ON t.event_id = e.id
         WHERE e.vendor_id = ? 
-        AND DATE(t.purchase_date) BETWEEN ? AND ?
+        AND t.purchase_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
         GROUP BY DATE(t.purchase_date)
         ORDER BY sale_date";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("iss", $vendor_id, $start_date, $end_date);
+$stmt->bind_param("i", $vendor_id);
 $stmt->execute();
-$result = $stmt->get_result();
+$daily_sales = $stmt->get_result();
 
-$sales_data = [];
-$total_revenue = 0;
-$total_tickets = 0;
-
-while ($row = $result->fetch_assoc()) {
-    $sales_data[] = $row;
-    $total_revenue += $row['revenue'];
-    $total_tickets += $row['tickets_sold'];
-}
-
-// Get event-wise sales
+// Get sales by event
 $sql = "SELECT 
-            e.title,
-            COUNT(*) as tickets_sold,
-            SUM(t.price) as revenue
+        e.title,
+        COUNT(*) as tickets_sold,
+        SUM(t.price) as revenue
         FROM tickets t
         JOIN events e ON t.event_id = e.id
-        WHERE e.vendor_id = ? 
-        AND DATE(t.purchase_date) BETWEEN ? AND ?
+        WHERE e.vendor_id = ?
         GROUP BY e.id
         ORDER BY revenue DESC";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("iss", $vendor_id, $start_date, $end_date);
+$stmt->bind_param("i", $vendor_id);
 $stmt->execute();
 $event_sales = $stmt->get_result();
+
+// Get sales by category
+$sql = "SELECT 
+        e.category,
+        COUNT(*) as tickets_sold,
+        SUM(t.price) as revenue
+        FROM tickets t
+        JOIN events e ON t.event_id = e.id
+        WHERE e.vendor_id = ?
+        GROUP BY e.category
+        ORDER BY revenue DESC";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $vendor_id);
+$stmt->execute();
+$category_sales = $stmt->get_result();
+
+// Prepare data for charts
+$dates = [];
+$revenues = [];
+$tickets = [];
+
+while ($row = $daily_sales->fetch_assoc()) {
+    $dates[] = date('M j', strtotime($row['sale_date']));
+    $revenues[] = $row['revenue'];
+    $tickets[] = $row['tickets_sold'];
+}
 
 ?>
 
@@ -87,8 +99,11 @@ $event_sales = $stmt->get_result();
                     <a href="events/index.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-calendar me-2"></i>My Events
                     </a>
+                    <a href="sales.php" class="list-group-item list-group-item-action">
+                        <i class="fas fa-chart-line me-2"></i>Sales Report
+                    </a>
                     <a href="sales_trend.php" class="list-group-item list-group-item-action active">
-                        <i class="fas fa-chart-line me-2"></i>Sales Trend
+                        <i class="fas fa-chart-bar me-2"></i>Sales Trend
                     </a>
                     <a href="earnings.php" class="list-group-item list-group-item-action">
                         <i class="fas fa-wallet me-2"></i>Earnings
@@ -99,100 +114,172 @@ $event_sales = $stmt->get_result();
 
         <!-- Main Content -->
         <div class="col-md-9">
-            <!-- Date Range Filter -->
-            <div class="card mb-4 fade-in">
+            <!-- Debug Information -->
+            <div class="card fade-in mb-4">
+                <div class="card-header bg-transparent border-warning">
+                    <h5 class="text-warning mb-0">Debug Information</h5>
+                </div>
                 <div class="card-body">
-                    <form method="GET" class="row align-items-end">
-                        <div class="col-md-4">
-                            <label class="form-label text-warning">Start Date</label>
-                            <input type="date" class="form-control" name="start_date" 
-                                   value="<?php echo $start_date; ?>">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-warning">End Date</label>
-                            <input type="date" class="form-control" name="end_date" 
-                                   value="<?php echo $end_date; ?>">
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-warning w-100">
-                                <i class="fas fa-filter me-2"></i>Apply Filter
-                            </button>
-                        </div>
-                    </form>
+                    <pre class="text-light">
+<?php
+echo "Dates: " . json_encode($dates) . "\n";
+echo "Revenues: " . json_encode($revenues) . "\n";
+echo "Tickets: " . json_encode($tickets) . "\n";
+?>
+                    </pre>
                 </div>
             </div>
 
-            <!-- Summary Cards -->
-            <div class="row mb-4">
+            <!-- Revenue Trend Chart -->
+            <div class="card fade-in mb-4">
+                <div class="card-header bg-transparent border-warning">
+                    <h5 class="text-warning mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Revenue Trend (Last 30 Days)
+                    </h5>
+                </div>
+                <div class="card-body" style="height: 400px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Sales by Event -->
                 <div class="col-md-6">
-                    <div class="card stat-card fade-in">
-                        <div class="card-body text-center p-4">
-                            <div class="stat-icon mb-3">
-                                <i class="fas fa-ticket-alt fa-2x text-warning"></i>
+                    <div class="card fade-in mb-4">
+                        <div class="card-header bg-transparent border-warning">
+                            <h5 class="text-warning mb-0">
+                                <i class="fas fa-ticket-alt me-2"></i>Sales by Event
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Event</th>
+                                            <th>Tickets</th>
+                                            <th>Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php while ($event = $event_sales->fetch_assoc()): ?>
+                                            <tr>
+                                                <td class="text-warning"><?php echo htmlspecialchars($event['title']); ?></td>
+                                                <td class="text-light"><?php echo number_format($event['tickets_sold']); ?></td>
+                                                <td class="text-warning">₦<?php echo number_format($event['revenue']); ?></td>
+                                            </tr>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
                             </div>
-                            <h2 class="stat-value text-warning mb-2"><?php echo $total_tickets; ?></h2>
-                            <p class="stat-label text-light mb-0">Total Tickets Sold</p>
                         </div>
                     </div>
                 </div>
+
+                <!-- Sales by Category -->
                 <div class="col-md-6">
-                    <div class="card stat-card fade-in">
-                        <div class="card-body text-center p-4">
-                            <div class="stat-icon mb-3">
-                                <i class="fas fa-money-bill-wave fa-2x text-warning"></i>
-                            </div>
-                            <h2 class="stat-value text-warning mb-2"><?php echo formatCurrency($total_revenue); ?></h2>
-                            <p class="stat-label text-light mb-0">Total Revenue</p>
+                    <div class="card fade-in mb-4">
+                        <div class="card-header bg-transparent border-warning">
+                            <h5 class="text-warning mb-0">
+                                <i class="fas fa-tags me-2"></i>Sales by Category
+                            </h5>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sales Trend Chart -->
-            <div class="card mb-4 fade-in">
-                <div class="card-header bg-transparent border-warning">
-                    <h5 class="text-warning mb-0">
-                        <i class="fas fa-chart-line me-2"></i>Sales Trend
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="salesTrendChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Event-wise Sales -->
-            <div class="card fade-in">
-                <div class="card-header bg-transparent border-warning">
-                    <h5 class="text-warning mb-0">
-                        <i class="fas fa-chart-pie me-2"></i>Event-wise Sales
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Event</th>
-                                    <th>Tickets Sold</th>
-                                    <th>Revenue</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($event = $event_sales->fetch_assoc()): ?>
-                                    <tr>
-                                        <td class="text-warning"><?php echo htmlspecialchars($event['title']); ?></td>
-                                        <td class="text-light"><?php echo $event['tickets_sold']; ?></td>
-                                        <td class="text-light"><?php echo formatCurrency($event['revenue']); ?></td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
+                        <div class="card-body" style="height: 400px;">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Wait for the page to load
+window.onload = function() {
+    console.log('Page loaded, initializing charts...');
+    
+    // Get the chart data
+    const dates = <?php echo json_encode($dates); ?>;
+    const revenues = <?php echo json_encode($revenues); ?>;
+    const tickets = <?php echo json_encode($tickets); ?>;
+    
+    console.log('Chart data:', { dates, revenues, tickets });
+
+    // Initialize Revenue Chart
+    const revenueChart = new Chart(
+        document.getElementById('revenueChart'),
+        {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [
+                    {
+                        label: 'Revenue (₦)',
+                        data: revenues,
+                        borderColor: '#ffc107',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        fill: true
+                    },
+                    {
+                        label: 'Tickets Sold',
+                        data: tickets,
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        }
+    );
+
+    // Initialize Category Chart
+    const categoryLabels = [
+        <?php 
+        $category_sales->data_seek(0);
+        while ($category = $category_sales->fetch_assoc()) {
+            echo "'" . addslashes($category['category']) . "',";
+        }
+        ?>
+    ];
+    
+    const categoryValues = [
+        <?php 
+        $category_sales->data_seek(0);
+        while ($category = $category_sales->fetch_assoc()) {
+            echo $category['revenue'] . ",";
+        }
+        ?>
+    ];
+
+    console.log('Category data:', { categoryLabels, categoryValues });
+
+    const categoryChart = new Chart(
+        document.getElementById('categoryChart'),
+        {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    backgroundColor: ['#ffc107', '#28a745', '#17a2b8', '#dc3545', '#6610f2', '#fd7e14']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        }
+    );
+}
+</script>
 
 <style>
 /* Custom styles */
@@ -233,17 +320,6 @@ $event_sales = $stmt->get_result();
     color: var(--dark-bg);
 }
 
-.stat-card {
-    background: var(--dark-card);
-    border: none;
-    border-radius: 15px;
-    transition: transform 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-}
-
 .table {
     color: var(--text-color);
 }
@@ -259,107 +335,16 @@ $event_sales = $stmt->get_result();
     border-bottom: 2px solid var(--primary-color);
 }
 
-.form-control {
-    background-color: var(--dark-card);
-    border: 1px solid rgba(255, 215, 0, 0.2);
-    color: var(--text-color);
+.table tbody tr:hover {
+    background-color: var(--dark-hover) !important;
 }
 
-.form-control:focus {
-    background-color: var(--dark-card);
-    border-color: var(--primary-color);
-    color: var(--text-color);
-    box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+/* Additional styles for charts */
+.card-body {
+    padding: 1rem;
 }
-</style>
 
-<script>
-// Prepare data for the chart
-const salesData = <?php echo json_encode($sales_data); ?>;
-const dates = salesData.map(item => item.sale_date);
-const revenue = salesData.map(item => item.revenue);
-const tickets = salesData.map(item => item.tickets_sold);
-
-// Create the chart
-const ctx = document.getElementById('salesTrendChart').getContext('2d');
-new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: dates,
-        datasets: [
-            {
-                label: 'Revenue (₦)',
-                data: revenue,
-                borderColor: '#ffc107',
-                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                fill: true,
-                yAxisID: 'y'
-            },
-            {
-                label: 'Tickets Sold',
-                data: tickets,
-                borderColor: '#17a2b8',
-                backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                fill: true,
-                yAxisID: 'y1'
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        interaction: {
-            mode: 'index',
-            intersect: false,
-        },
-        scales: {
-            y: {
-                type: 'linear',
-                display: true,
-                position: 'left',
-                title: {
-                    display: true,
-                    text: 'Revenue (₦)',
-                    color: '#ffc107'
-                },
-                grid: {
-                    color: 'rgba(255, 255, 255, 0.1)'
-                },
-                ticks: {
-                    color: '#ffc107'
-                }
-            },
-            y1: {
-                type: 'linear',
-                display: true,
-                position: 'right',
-                title: {
-                    display: true,
-                    text: 'Tickets Sold',
-                    color: '#17a2b8'
-                },
-                grid: {
-                    drawOnChartArea: false
-                },
-                ticks: {
-                    color: '#17a2b8'
-                }
-            },
-            x: {
-                grid: {
-                    color: 'rgba(255, 255, 255, 0.1)'
-                },
-                ticks: {
-                    color: '#ffffff'
-                }
-            }
-        },
-        plugins: {
-            legend: {
-                labels: {
-                    color: '#ffffff'
-                }
-            }
-        }
-    }
-});
-</script> 
+canvas {
+    background-color: transparent;
+}
+</style> 

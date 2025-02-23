@@ -211,50 +211,34 @@ $recent_transactions = $stmt->get_result();
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="withdrawForm">
-                    <div class="mb-3">
-                        <label class="form-label text-warning">Available Balance</label>
-                        <h3 class="text-warning">₦<?php echo number_format($earnings['total_earnings']); ?></h3>
-                    </div>
+                <form id="withdrawForm" onsubmit="handleWithdrawal(event)">
                     <div class="mb-3">
                         <label for="amount" class="form-label text-warning">Withdrawal Amount</label>
                         <div class="input-group">
-                            <span class="input-group-text">₦</span>
-                            <input type="number" class="form-control" id="amount" name="amount" min="1000" max="<?php echo $earnings['total_earnings']; ?>" required>
+                            <span class="input-group-text bg-dark border-warning text-warning">₦</span>
+                            <input type="number" class="form-control" id="amount" name="amount" 
+                                   min="1000" step="0.01" required>
                         </div>
                         <small class="text-light">Minimum withdrawal: ₦1,000</small>
                     </div>
+
                     <div class="mb-3">
                         <label for="bank_name" class="form-label text-warning">Bank Name</label>
-                        <select class="form-select" id="bank_name" name="bank_name" required>
-                            <option value="">Select your bank</option>
-                            <option value="access">Access Bank</option>
-                            <option value="gtb">Guaranty Trust Bank</option>
-                            <option value="first">First Bank</option>
-                            <option value="uba">United Bank for Africa</option>
-                            <option value="zenith">Zenith Bank</option>
-                            <option value="stanbic">Stanbic IBTC</option>
-                            <option value="union">Union Bank</option>
-                            <option value="fidelity">Fidelity Bank</option>
-                        </select>
+                        <input type="text" class="form-control" id="bank_name" name="bank_name" required>
                     </div>
+
                     <div class="mb-3">
                         <label for="account_number" class="form-label text-warning">Account Number</label>
                         <input type="text" class="form-control" id="account_number" name="account_number" 
-                               pattern="[0-9]{10}" maxlength="10" required>
-                        <small class="text-light">Enter your 10-digit account number</small>
+                               pattern="[0-9]{10}" title="Please enter a valid 10-digit account number" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="account_name" class="form-label text-warning">Account Name</label>
-                        <input type="text" class="form-control" id="account_name" name="account_name" required>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-money-bill-wave me-2"></i>Withdraw
+                        </button>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer border-warning">
-                <button type="button" class="btn btn-outline-warning" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" form="withdrawForm" class="btn btn-warning">
-                    <i class="fas fa-money-bill-wave me-2"></i>Withdraw
-                </button>
             </div>
         </div>
     </div>
@@ -348,38 +332,33 @@ $recent_transactions = $stmt->get_result();
 </style>
 
 <script>
-document.getElementById('withdrawForm').addEventListener('submit', function(e) {
+async function handleWithdrawal(e) {
     e.preventDefault();
-    const amount = document.getElementById('amount').value;
-    const bankName = document.getElementById('bank_name').value;
-    const accountNumber = document.getElementById('account_number').value;
-    const accountName = document.getElementById('account_name').value;
     
-    // Show loading state
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+    const form = e.target;
+    const formData = new FormData(form);
     
-    // Simulate processing
-    setTimeout(() => {
-        // Show success message
-        alert('Withdrawal request submitted successfully!\n\nAmount: ₦' + amount + '\nBank: ' + bankName + '\nAccount: ' + accountNumber + '\n\nFunds will be transferred within 24 hours.');
+    try {
+        const response = await fetch('process_withdrawal.php', {
+            method: 'POST',
+            body: formData
+        });
         
-        // Reset form and close modal
-        this.reset();
-        bootstrap.Modal.getInstance(document.getElementById('withdrawModal')).hide();
+        const result = await response.json();
         
-        // Reset button
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-    }, 2000);
-});
-
-// Validate account number input
-document.getElementById('account_number').addEventListener('input', function(e) {
-    this.value = this.value.replace(/\D/g, '').substr(0, 10);
-});
+        if (result.success) {
+            alert('Withdrawal request processed successfully! The funds will be transferred to your account within 24 hours.');
+            location.reload(); // Reload page to update balance
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('An error occurred while processing your withdrawal request. Please try again.');
+    }
+    
+    // Hide modal
+    bootstrap.Modal.getInstance(document.getElementById('withdrawModal')).hide();
+}
 </script>
 
  

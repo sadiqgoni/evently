@@ -341,8 +341,7 @@ function updateTotal() {
     const quantity = parseInt(document.getElementById('quantity').value);
     const price = <?php echo $event['ticket_price']; ?>;
     const total = quantity * price;
-    document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
+    document.getElementById('totalAmount').textContent = '₦' + total.toFixed(2);
 }
 </script>
 
-<?php require_once '../../includes/footer.php'; ?> 
