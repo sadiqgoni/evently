@@ -1,0 +1,379 @@
+/* Custom Variables */
+:root {
+    --primary-color: #FFD700;  /* Yellow */
+    --secondary-color: #FFC107;
+    --accent-color: #FFD700;
+    --text-color: #FFFFFF;
+    --dark-bg: #121212;
+    --dark-card: #1E1E1E;
+    --dark-hover: #2D2D2D;
+}
+
+/* General Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--dark-bg);
+}
+
+footer {
+    margin-top: auto;
+}
+
+/* Custom Navbar */
+.navbar-custom {
+    background-color: var(--dark-bg);
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-custom .navbar-brand {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.navbar-custom .nav-link {
+    color: var(--text-color) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-custom .nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Hero Section */
+.hero-section {
+    background-color: var(--dark-bg);
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    padding: 100px 0;
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.hero-content h1 span {
+    color: var(--primary-color);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+/* Cards */
+.card {
+    background-color: var(--dark-card);
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    background-color: var(--dark-hover);
+}
+
+.card-header {
+    background-color: var(--dark-card);
+    color: var(--text-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Buttons */
+.btn-custom-primary {
+    background-color: var(--primary-color);
+    color: var(--dark-bg);
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-custom-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    color: var(--dark-bg);
+    background-color: var(--secondary-color);
+}
+
+/* Features Section */
+.features-section {
+    background-color: var(--dark-card);
+    padding: 80px 0;
+}
+
+.feature-card {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--dark-bg);
+    border-radius: 15px;
+    margin: 1rem;
+}
+
+.feature-card i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.feature-card h3 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.feature-card p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Auth Forms */
+.auth-card {
+    max-width: 450px;
+    margin: 2rem auto;
+    border-radius: 15px;
+    background-color: var(--dark-card);
+}
+
+.auth-card .card-header {
+    text-align: center;
+    padding: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-card .card-body {
+    padding: 2rem;
+}
+
+.form-control {
+    background-color: var(--dark-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    border-radius: 8px;
+    padding: 0.8rem 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    background-color: var(--dark-card);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+    box-shadow: none;
+}
+.form-label{
+    color: var(--text-color);
+}
+
+
+/* Footer */
+.footer {
+    background-color: var(--dark-card);
+    color: var(--text-color);
+    padding: 50px 0;
+    margin-top: 50px;
+}
+
+.footer h5 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+}
+
+.footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer ul li {
+    margin-bottom: 0.8rem;
+}
+
+.footer ul li a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.footer ul li a:hover {
+    color: var(--primary-color);
+    padding-left: 5px;
+}
+
+/* Event Cards */
+.event-card {
+    background-color: var(--dark-card);
+    color: var(--text-color);
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.event-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.event-card .card-body {
+    padding: 1.5rem;
+}
+
+.event-card .card-title {
+    color: var(--text-color);
+}
+
+.event-meta {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+/* Section Headings */
+.section-heading {
+    color: var(--text-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.section-heading span {
+    color: var(--primary-color);
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-section {
+        min-height: 400px;
+    }
+    
+    .feature-card {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Dashboard Styles */
+.dashboard-stats {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Form Styles */
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Ticket Styles */
+.ticket {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    position: relative;
+}
+
+.ticket:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -10px;
+    width: 20px;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 5px,
+        #f8f9fa 5px,
+        #f8f9fa 10px
+    );
+}
+
+/* Wallet Styles */
+.wallet-card {
+    background: linear-gradient(45deg, #2193b0, #6dd5ed);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.transaction-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Alert Styles */
+.alert {
+    background-color: var(--dark-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: #2193b0;
+    border-color: #2193b0;
+}
+
+.btn-primary:hover {
+    background-color: #1b7a8d;
+    border-color: #1b7a8d;
+}
+
+/* Navigation Styles */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .wallet-card {
+        margin-bottom: 15px;
+    }
+    
+    .event-card img {
+        height: 150px;
+    }
+} 

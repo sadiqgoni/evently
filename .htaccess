@@ -1,0 +1,30 @@
+RewriteEngine On
+RewriteBase /evently/
+
+# Handle direct access to PHP files
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)$ $1.php [QSA,L]
+
+# Prevent direct access to includes directory
+RewriteRule ^includes/ - [F,L]
+
+# Error Documents
+ErrorDocument 404 /evently/404.php
+ErrorDocument 403 /evently/403.php
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# PHP Settings
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule> 
