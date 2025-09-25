@@ -24,6 +24,36 @@ A comprehensive event management platform built with PHP that allows users to di
 - **Transaction Management**: Handle payments, refunds, and withdrawals
 - **System Analytics**: Comprehensive dashboard with system-wide statistics
 
+## 📸 Screenshots
+
+### Homepage
+![Homepage](assets/images/Screenshot%202025-09-25%20at%2015.10.04.png)
+*Clean and modern homepage with featured events*
+
+### Event Details
+![Event Details](assets/images/Screenshot%202025-09-25%20at%2015.10.24.png)
+*Detailed event information with booking options*
+
+### Event Creation
+![Event Creation](assets/images/Screenshot%202025-09-25%20at%2015.10.43.png)
+*Easy-to-use event creation form*
+
+### Customer Dashboard
+![Customer Dashboard](assets/images/Screenshot%202025-09-25%20at%2015.10.53.png)
+*Customer dashboard with ticket management*
+
+### Admin Panel
+![Admin Panel](assets/images/Screenshot%202025-09-25%20at%2015.11.21.png)
+*Powerful admin interface for system management*
+
+### User Management
+![User Management](assets/images/Screenshot%202025-09-25%20at%2015.11.32.png)
+*Comprehensive user management system*
+
+### System Analytics
+![System Analytics](assets/images/Screenshot%202025-09-25%20at%2015.11.43.png)
+*Detailed analytics and reporting*
+
 ## 🚀 Technology Stack
 
 - **Backend**: PHP 8.0+
