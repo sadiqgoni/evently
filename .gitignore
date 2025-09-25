@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+*/.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# PHP
+*.log
+error_log
+
+# Composer (commented out - we want to track our vendor files)
+# vendor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Uploads (keep directory structure but not files)
+uploads/events/*
+!uploads/events/.gitkeep
+
+# Cache
+cache/
+tmp/
